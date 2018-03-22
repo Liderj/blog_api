@@ -13,27 +13,21 @@ class AuthController extends Controller
       $rules = [
         'mobile'   => [
           'required',
-          'exists:users',
         ],
         'password' => 'required|string|min:6|max:18',
       ];
       $messages = [
         'required'=>'手机号或密码不能为空',
-        'exists'=>'手机号未注册',
       ];
       // 验证参数，如果验证失败，则会抛出 ValidationException 的异常
-      $params = $this->validate($request, $rules,$messages);
-
+        $params = $this->validate($request, $rules,$messages);
       if($token = Auth::guard('api')->attempt($params))
       {
         $result = Auth::user()->all()[0];
         $result['token'] = $token;
-        return response($result, 201);
+        return response( ['code'=>200,'data'=>$result]);
       }
-      // 使用 Auth 登录用户，如果登录成功，则返回 201 的 code 和 token，如果登录失败则返回
-      return ($token = Auth::guard('api')->attempt($params))
-        ? response(['token' => 'bearer ' . $token], 201)
-        : response(['error' => '账号或密码错误'], 400);
+      return response(['error' => '账号或密码错误','code'=>400]);
     }
     public function logout()
     {
