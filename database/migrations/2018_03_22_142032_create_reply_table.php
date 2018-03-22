@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCategoryTable extends Migration
+class CreateReplyTable extends Migration
 {
   /**
    * Run the migrations.
@@ -13,9 +13,12 @@ class CreateCategoryTable extends Migration
    */
   public function up()
   {
-    Schema::create('category', function (Blueprint $table) {
+    Schema::create('reply', function (Blueprint $table) {
       $table->increments('id');
-      $table->string('name', 255)->comment('分类名称');
+      $table->bigInteger('cid')->comment('评论id');
+      $table->bigInteger('f_uid')->comment('回复人id');
+      $table->bigInteger('t_uid')->comment('回复人对象id');
+      $table->string('content', 500)->comment('回复内容');
       $table->timestamps();
     });
   }
@@ -27,6 +30,6 @@ class CreateCategoryTable extends Migration
    */
   public function down()
   {
-    Schema::dropIfExists('category');
+    Schema::dropIfExists('reply');
   }
 }
