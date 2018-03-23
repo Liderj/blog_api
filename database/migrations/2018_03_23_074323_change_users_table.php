@@ -27,6 +27,9 @@ class ChangeUsersTable extends Migration
      */
     public function down()
     {
-        //
+      Schema::table('users', function (Blueprint $table) {
+        $table->integer('level')->default(1)->comment('用户等级：0、超级管理员，1、普通，2、高级管理');
+        $table->dropColumn('roles');
+      });
     }
 }

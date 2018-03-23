@@ -15,7 +15,10 @@ class UsersTableSeeder extends Seeder
         'nickname' => 'admin',
         'mobile' => '13551031357',
         'password' => bcrypt('123456'),
-        'level' => '0',
+        'roles' => '1',
+      ]);
+      DB::table('roles')->insert([
+        'name' => '超级管理员',
       ]);
     }
 }
