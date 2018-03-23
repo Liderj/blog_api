@@ -18,5 +18,5 @@ Route::prefix('auth')->group(function($router) {
 
 });
 Route::middleware('refresh.token')->group(function($router) {
-  $router->get('profile','UserController@profile');
+  $router->get('user/info','UserController@info');
 });

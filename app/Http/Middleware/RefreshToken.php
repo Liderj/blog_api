@@ -44,6 +44,6 @@ class RefreshToken  extends BaseMiddleware
       }
 
       // 在响应头中返回新的 token
-      return $this->setAuthenticationHeader($next($request), $token);
+      return $next($request);
     }
 }

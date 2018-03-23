@@ -9,8 +9,8 @@ class UserController extends Controller
 {
     //
 
-  public function profile()
+  public function info()
   {
-    return Auth::user();
+    return $this->message(Auth::user());
   }
 }
