@@ -50,13 +50,13 @@ trait ApiMessage
    */
   public function status($status, array $data, $code = null){
 
-    if ($code){
-      $this->setStatusCode($code);
-    }
+//    if ($code){
+//      $this->setStatusCode($code);
+//    }
 
     $status = [
       'status' => $status,
-      'code' => $this->statusCode
+      'code' => $code
     ];
 
     $data = array_merge($status,$data);
@@ -70,9 +70,10 @@ trait ApiMessage
    * @param string $status
    * @return mixed
    */
-  public function failed($message, $code = FoundationResponse::HTTP_BAD_REQUEST, $status = 'error'){
-
-    return $this->setStatusCode($code)->message($message,$status);
+  public function failed($message, $status = 'error',$code=400){
+    return $this->status($status,[
+      'message' => $message
+    ],$code);
   }
 
   /**
@@ -84,7 +85,7 @@ trait ApiMessage
 
     return $this->status($status,[
       'message' => $message
-    ]);
+    ],200);
   }
 
   /**
@@ -114,7 +115,7 @@ trait ApiMessage
    */
   public function success($data, $status = "success"){
 
-    return $this->status($status,compact('data'));
+    return $this->status($status,compact('data'),200);
   }
 
   /**

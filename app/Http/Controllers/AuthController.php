@@ -14,7 +14,7 @@ class AuthController extends BaseController
         'mobile'   => [
           'required',
         ],
-        'p assword' => 'required|string|min:6|max:18',
+        'password' => 'required|string|min:6|max:18',
       ];
       $messages = [
         'required'=>'手机号或密码不能为空',
@@ -23,14 +23,14 @@ class AuthController extends BaseController
         $params = $this->validate($request, $rules,$messages);
       if($token = Auth::guard('api')->attempt($params))
       {
-        return response( ['code'=>200,'data'=>compact('token')]);
+        return $this->success(compact('token'));
       }
-      return response(['error' => '账号或密码错误','code'=>400]);
+      return  $this->failed('账号或密码错误');
     }
     public function logout()
     {
       Auth::guard('api')->logout();
 
-      return response(['message' => '退出成功']);
+      return $this->message('退出成功');
     }
 }
