@@ -14,7 +14,7 @@ class AuthController extends BaseController
         'mobile'   => [
           'required',
         ],
-        'password' => 'required|string|min:6|max:18',
+        'p assword' => 'required|string|min:6|max:18',
       ];
       $messages = [
         'required'=>'手机号或密码不能为空',
