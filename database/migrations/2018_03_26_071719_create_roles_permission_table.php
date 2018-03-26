@@ -22,7 +22,7 @@ class CreateRolesPermissionTable extends Migration
     Schema::rename('permission', 'permissions');
     Schema::table('permissions', function (Blueprint $table) {
       $table->dropColumn('rid');
-      $table->string('url', 255)->comment('菜单对应路由或api');
+      $table->string('url', 255)->comment('菜单对应路由或api')->nullable();
     });
   }
 

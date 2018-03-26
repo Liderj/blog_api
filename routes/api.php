@@ -19,4 +19,8 @@ Route::prefix('auth')->group(function($router) {
 });
 Route::middleware('refresh.token')->group(function($router) {
   $router->get('user/info','UserController@info');
+  $router->get('permission/all','PermissionController@all');
+  $router->get('permission/{id}','PermissionController@getOne');
+  $router->get('permission/{id}/delete','PermissionController@delete');
+
 });
