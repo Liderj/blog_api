@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 class BaseController extends Controller
 {
     use ApiMessage;
+
     public function format($data)
     {
       if (!empty($data)) {

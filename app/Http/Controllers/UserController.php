@@ -12,7 +12,7 @@ class UserController extends BaseController
   public function info()
   {
     $user = Auth::user();
-    $user->roles = $this->getRoles($user->id);
+    $user->roles = $this->getRoles($user->roles);
     return $this->success($user);
   }
 
