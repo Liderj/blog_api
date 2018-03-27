@@ -2,27 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Role;
+use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class UserController extends BaseController
 {
 
-  public function info()
+  public function index(Request $request)
   {
-    $user = Auth::user();
-    $user->roles = $this->getRoles($user->roles);
-    return $this->success($user);
+    return $this->success($this->paginate('user',10,1,'1358'));
+    $page_size = $request->query('page_size',10);
+    return $this->success(User::paginate($page_size));
   }
-
-  public function getRoles($id)
-  {
-    $roles = Role::find($id);
-    $permission_list = $roles->permission()->where('status', 1)->get();
-    $roles['permission_list'] = $permission_list->isEmpty() ? null : $this->format($permission_list->toArray());
-    return $roles;
-  }
-
-
 }

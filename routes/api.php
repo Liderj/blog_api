@@ -18,7 +18,8 @@ Route::prefix('auth')->group(function($router) {
 
 });
 Route::middleware('refresh.token')->group(function($router) {
-  $router->get('user/info','UserController@info');
+  $router->get('user/info','AuthController@info');// 管理员详情
+
   $router->get('roles/index','RoleController@index');//角色列表
   $router->get('roles/{role}','RoleController@show');//角色详情
   $router->post('roles/create','RoleController@create');//创建角色
@@ -26,10 +27,11 @@ Route::middleware('refresh.token')->group(function($router) {
   $router->post('roles/{role}/update_permission','RoleController@updatePermission');//更新角色权限
   $router->post('roles/{role}/destroy','RoleController@destroy');//删除角色
 
-  $router->post('/permission/{permission}','PermissionController@update');
-  Route::apiResource('permission', 'PermissionController');//  权限资源路由
+  $router->post('/permission/{permission}/update','PermissionController@update'); //更新权限
 
-  Route::apiResource('post', 'PostController');
-
+  Route::apiResources([
+    'permission'=> 'PermissionController',//  权限资源路由
+    'user'=>'UserController'//  用户资源路由
+  ]);
 
 });
