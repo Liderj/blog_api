@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Permission;
 use App\Role;
-use App\Roles;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RoleController extends BaseController
 {
@@ -50,12 +48,11 @@ class RoleController extends BaseController
    * @param  \App\Roles $roles
    * @return \Illuminate\Http\Response
    */
-  public function show($id)
+  public function show(Role $role)
   {
-    $roles = Role::find($id);
-    $permission_list = $roles->permission()->get();
-    $roles['permission_list'] = $permission_list->isEmpty() ? null : $this->format($permission_list->toArray());
-    return $this->success($roles);
+    $permission_list = $role->permission()->get();
+    $role['permission_list'] = $permission_list->isEmpty() ? null : $this->format($permission_list->toArray());
+    return $this->success($role);
   }
 
   /**
@@ -65,7 +62,7 @@ class RoleController extends BaseController
    * @param  \App\Roles $roles
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, $id)
+  public function update(Request $request, Role $role)
   {
     $rules = [
       'name' => [
@@ -79,16 +76,14 @@ class RoleController extends BaseController
       'name.unique' => '该名称已存在'
     ];
     $this->validate($request, $rules, $messages);
-    $role = Role::find($id);
     $role->name = $request->input('name');
     $role->status = $request->input('status');
     return $role->save() ? $this->message('修改成功') : $this->failed('修改失败');
 
   }
 
-  public function updatePermission(Request $request,$id)
+  public function updatePermission(Request $request, Role $role)
   {
-    $role = Role::find($id);
     $res = $role->permission()->sync(json_decode($request->permissionId));
     return $res ? $this->message('权限修改成功') : $this->failed('权限修改失败');
 
@@ -100,12 +95,24 @@ class RoleController extends BaseController
    * @param  \App\Roles $roles
    * @return \Illuminate\Http\Response
    */
-  public function destroy($id)
+  public function destroy(Role $role)
   {
-//    将拥有该角色的管理员全部分配到未设置权限的角色
-    User::where('roles',$id)->update(['roles' => 2]);
-//    删除关联
-    $res =  Role::find($id)->permission()->detach();
-    return $res ? $this->message('角色删除成功') : $this->failed('角色删除失败');
+    //创建数据库事务
+    DB::beginTransaction();
+    try {
+      //    将拥有该角色的管理员全部分配到未设置权限的角色
+      User::where('roles', $role->id)->update(['roles' => 2]);
+      //    删除关联
+      $role->permission()->detach();
+      //    删除角色
+      $res = $role->delete();
+
+      DB::commit();
+      return $res ? $this->message('角色删除成功') : $this->failed('角色删除失败');
+    } catch (\Exception $exception) {
+      //      遇到异常回滚事务
+      　DB::rollback();
+      return $this->failed('操作失败，请刷新重试');
+    }
   }
 }
