@@ -58,6 +58,9 @@ class Handler extends ExceptionHandler
       }
       // 用户认证的异常，
       if ($exception instanceof UnauthorizedHttpException) {
+        if($exception->getCode() == 403){
+          return  $this->failed($exception->getMessage(),'error',403);
+        }
         return  $this->failed($exception->getMessage(),'error',405);
       }
       return parent::render($request, $exception);

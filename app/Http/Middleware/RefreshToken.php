@@ -2,16 +2,18 @@
 
 namespace App\Http\Middleware;
 
+use App\MyTrait\ApiMessage;
+use App\Role;
 use Auth;
 use Closure;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class RefreshToken extends BaseMiddleware
 {
+  use ApiMessage;
   /**
    * Handle an incoming request.
    *
@@ -24,7 +26,13 @@ class RefreshToken extends BaseMiddleware
     $this->checkForToken($request);
     try {
       if ($this->auth->parseToken()->authenticate()) {
-        return $next($request);
+        $url  = $request->route()->getName();
+        $permissions = Role::find($this->auth->user()->roles)->permission()->where('status', 1)->pluck('url');
+        $response = $next($request);
+        if(!$permissions->contains($url)){
+          throw new UnauthorizedHttpException('jwt-auth', '你没有此权限',null,403);
+        };
+        return $response;
       }
       throw new UnauthorizedHttpException('jwt-auth', '未登录');
     } catch (TokenExpiredException $exception) {
@@ -39,4 +47,5 @@ class RefreshToken extends BaseMiddleware
       throw new UnauthorizedHttpException('jwt-auth', '请求header中未添加token');
     }
   }
+
 }

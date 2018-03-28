@@ -36,12 +36,19 @@ class AuthController extends BaseController
     return $this->message('退出成功');
   }
 
-//  获取管理员详情
+//  获取登录用户详情
   public function info()
   {
     $user = Auth::user();
-    $user->roles = $this->getRoles($user->roles);
-    return $this->success($user);
+    if($user->type == 0){
+      if(!$this->getRoles($user->roles)){
+        return $this->failed('改管理员角色未分配权限');
+      }
+      $user->roles = $this->getRoles($user->roles);
+      return $this->success($user);
+    }else{
+      return $this->success($user);
+    }
   }
 
 //获取管理员角色权限

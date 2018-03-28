@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
 {
@@ -40,7 +41,7 @@ class UserController extends BaseController
     return $this->success($user);
   }
 
-//  更新管理员信息
+//  更新用户信息
   public function update(Request $request, User $user)
   {
 
@@ -50,27 +51,36 @@ class UserController extends BaseController
     ];
     $messages = [
       'nickname.required' => '昵称不能为空',
-      'password.required' => '密码不能为空'
+      'nickname.unique' => '昵称已存在',
     ];
     $this->validate($request, $rules, $messages);
 
-    if (Auth::user()->type != 1) {
-//      要更改的为管理员用户资料时仅超管可操作
-      if ($user->type == 0 && Auth::user()->id != 1) {
-        return $this->failed('仅超级管理员可修改管理员信息');
-      } else {
-        $params = $request->only(['password', 'nickname', 'avatar', 'sex', 'status', 'roles', 'type']);
-        $params['password'] = bcrypt($params['password']);
-        foreach ($params as $key => $v) {
-          if ($v != $user[$key]) {
-            $user[$key] = $v;
-          }
-        }
-        return $user->save() ? $this->message('修改成功') : $this->failed('修改失败');
-      }
-    } else {
-      return $this->failed('仅超级管理员可修改');
+    if(User::where('nickname',$request->input('nickname'))->count()&&$user->nickname !=$request->input('nickname')){
+       return $this->failed('此昵称已存在');
     }
+
+    $params = null;
+    //用户修改自己的信息
+    if (Auth::user()->id == $user->id) {
+      $old_pwd = Hash::check( $request->input('old_password'),Auth::user()->password);
+      if (!$old_pwd) {
+        return $this->failed('原密码输入错误');
+      }
+      $params = $request->only(['password', 'nickname', 'avatar', 'sex']);
+    }
+    //超管修改用户的信息
+    else if ( Auth::user()->id == 1) {
+      $params = $request->only(['password', 'nickname', 'avatar', 'sex', 'status', 'roles', 'type']);
+    }else{
+      return $this->failed('仅超级管理员可修改其他用户信息');
+    }
+    $params['password'] = bcrypt($params['password']);
+    foreach ($params as $key => $v) {
+      if ($v != $user[$key]) {
+        $user[$key] = $v;
+      }
+    }
+    return $user->save() ? $this->message('修改成功') : $this->failed('修改失败');
 
   }
 
@@ -103,16 +113,22 @@ class UserController extends BaseController
     return $user->save() ? $this->message('添加成功') : $this->failed('添加失败');
   }
 
-//  删除管理员
+//  删除用户
   public function destroy(User $user)
   {
-    if ($user->roles == 3) {
+    if( Auth::user()->type !=0){
+      return $this->failed('仅管理员可删除用户');
+    }
+    if ($user->type != 0 && Auth::user()->id != 1) {
+      return $this->failed('仅超级管理员可删除管理员');
+    }
+    if ($user->id == 1) {
       return $this->failed('超级管理员不可以删除');
     }
     //      创建数据库事务
     DB::beginTransaction();
     try {
-      //    删除管理员
+      //    删除用户
       $res = $user->delete();
       DB::commit();
       return $res ? $this->message('删除成功') : $this->failed('删除失败');
@@ -123,13 +139,16 @@ class UserController extends BaseController
     }
   }
 
-//  用户状态
+//  用户状态更改
   public function frozen(User $user)
   {
-    if ($user->type == 0 && Auth::user()->id != 1) {
+    if( Auth::user()->type !=0){
+      return $this->failed('仅管理员可修改用户状态');
+    }
+    if ($user->type != 0 && Auth::user()->id != 1) {
       return $this->failed('仅超级管理员可修改管理员状态');
     }
-    $user->status ==0? $user->status=1:$user->status=0;
+    $user->status == 0 ? $user->status = 1 : $user->status = 0;
     return $user->save() ? $this->message('修改状态成功') : $this->failed('修改状态失败');
 
   }
