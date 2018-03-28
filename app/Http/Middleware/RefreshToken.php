@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\MyTrait\ApiMessage;
+use App\Permission;
 use App\Role;
 use Auth;
 use Closure;
@@ -26,13 +27,7 @@ class RefreshToken extends BaseMiddleware
     $this->checkForToken($request);
     try {
       if ($this->auth->parseToken()->authenticate()) {
-        $url  = $request->route()->getName();
-        $permissions = Role::find($this->auth->user()->roles)->permission()->where('status', 1)->pluck('url');
-        $response = $next($request);
-        if(!$permissions->contains($url)){
-          throw new UnauthorizedHttpException('jwt-auth', '你没有此权限',null,403);
-        };
-        return $response;
+        return $next($request);
       }
       throw new UnauthorizedHttpException('jwt-auth', '未登录');
     } catch (TokenExpiredException $exception) {

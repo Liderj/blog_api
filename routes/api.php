@@ -17,7 +17,7 @@ Route::prefix('auth')->group(function($router) {
   $router->post('logout', 'AuthController@logout');
 
 });
-Route::middleware('refresh.token')->group(function($router) {
+Route::middleware('refresh.token','admin')->group(function($router) {
   $router->get('user/info','AuthController@info');// 管理员详情
 
   $router->get('roles/index','RoleController@index');//角色列表
@@ -32,6 +32,11 @@ Route::middleware('refresh.token')->group(function($router) {
   $router->post('/user/{user}/frozen','UserController@frozen');//冻结用户
 
   Route::resource('post','PostController',['except' => ['update','destroy']]);
+  Route::resource('category','CategoryController',['only' => ['index','store']]);
+  $router->post('/category/{category}/update','CategoryController@update');//更新分类
+  $router->post('/category/{category}/destroy','CategoryController@destroy');//删除分类
+
+
   Route::apiResources([
     'permission'=> 'PermissionController',//  权限资源路由
     'user'=>'UserController'//  用户资源路由
