@@ -24,7 +24,7 @@ class AuthController extends BaseController
     $params = $this->validate($request, $rules, $messages);
 
     if ($token = Auth::guard('api')->attempt($params)) {
-      return !Auth::user()->status ? $this->success(compact('token')) : $this->failed('该账户已被锁定，请联系相关人员解锁');
+      return Auth::user()->status ? $this->success(compact('token')) : $this->failed('该账户已被锁定，请联系相关人员解锁');
     }
     return $this->failed('账号或密码错误');
   }

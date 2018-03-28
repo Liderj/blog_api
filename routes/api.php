@@ -28,7 +28,10 @@ Route::middleware('refresh.token')->group(function($router) {
   $router->post('roles/{role}/destroy','RoleController@destroy');//删除角色
 
   $router->post('/permission/{permission}/update','PermissionController@update'); //更新权限
+  $router->post('/user/{user}/update','UserController@update'); //更新用户资料
+  $router->post('/user/{user}/frozen','UserController@frozen');//冻结用户
 
+  Route::resource('post','PostController',['except' => ['update','destroy']]);
   Route::apiResources([
     'permission'=> 'PermissionController',//  权限资源路由
     'user'=>'UserController'//  用户资源路由

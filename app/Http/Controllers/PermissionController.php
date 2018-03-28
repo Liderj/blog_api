@@ -41,16 +41,6 @@ class PermissionController extends BaseController
 
   public function update(Request $request, Permission $permission)
   {
-//      重名判断
-    $res = Permission::where('name', $request->input('name'))->count();
-    if ($res > 1) {
-      return $this->failed('已存在此权限名称');
-    }
-
-//    父权限不能为本身
-    if ($request->input('pid') == $permission->id) {
-      return $this->failed('父权限不能为本身');
-    }
 
 //    参数验证
     $rules = [
