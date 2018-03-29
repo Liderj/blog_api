@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends BaseController
 {
@@ -52,9 +53,19 @@ class PostController extends BaseController
   }
 
 
-  public function destory(Post $post)
+  public function destroy(Post $post)
   {
-    return $this->success($post->category()) ;
+    DB::beginTransaction();
+    try {
+      $post->comments()->delete();
+      $res= $post->delete();
+      DB::commit();
+      return $res ? $this->message('文章删除成功') : $this->failed('文章删除失败');
+    } catch (\Exception $exception) {
+      //      遇到异常回滚事务
+      　DB::rollback();
+      return $this->failed('操作失败，请刷新重试');
+    }
   }
 
   public function disable(Post $post)

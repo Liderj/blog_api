@@ -114,21 +114,36 @@ class UserController extends BaseController
   }
 
 //  删除用户
-  public function destroy(User $user)
+  public function destroy(Request $request, User $user)
   {
+    if ($user->id == 1) {
+      return $this->failed('超级管理员不可以删除');
+    }
     if( Auth::user()->type !=0){
       return $this->failed('仅管理员可删除用户');
     }
     if ($user->type != 0 && Auth::user()->id != 1) {
       return $this->failed('仅超级管理员可删除管理员');
     }
-    if ($user->id == 1) {
-      return $this->failed('超级管理员不可以删除');
-    }
+    //删除用户需验证登录密码
+      if(!$request->input('password') || !Hash::check( $request->input('password'),Auth::user()->password)){
+        return $this->failed('密码错误');
+      }
     //      创建数据库事务
     DB::beginTransaction();
     try {
-      //    删除用户
+      //    删除用户回复
+      foreach ($user->reply as $item){
+        $item->delete();
+      }
+      //    删除用户评论
+      foreach ($user->comment as $item){
+        $item->delete();
+      }
+      //    删除用户文章
+      foreach ($user->post as $item){
+        $item->delete();
+      }
       $res = $user->delete();
       DB::commit();
       return $res ? $this->message('删除成功') : $this->failed('删除失败');
