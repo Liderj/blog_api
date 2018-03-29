@@ -31,10 +31,18 @@ Route::middleware('refresh.token','admin')->group(function($router) {
   $router->post('/user/{user}/update','UserController@update'); //更新用户资料
   $router->post('/user/{user}/frozen','UserController@frozen');//冻结用户
 
-  Route::resource('post','PostController',['except' => ['update','destroy']]);
+  $router->get('/post/a/{post}','PostController@destory');//删除文章
+  $router->get('/post/top','PostController@top');//热推文章
+  Route::resource('post','PostController',['only' => ['index','show']]);
+  $router->post('/post/{post}/disable','PostController@disable');//关闭文章
+
+
   Route::resource('category','CategoryController',['only' => ['index','store']]);
   $router->post('/category/{category}/update','CategoryController@update');//更新分类
   $router->post('/category/{category}/destroy','CategoryController@destroy');//删除分类
+
+  $router->get('/comment/{comment}','CommentController@show');//更新分类
+
 
 
   Route::apiResources([

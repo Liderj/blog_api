@@ -87,7 +87,7 @@ class CategoryController extends BaseController
       DB::beginTransaction();
       try {
         //    将拥有该分类的文章全部分配到无分类下
-        Post::where('cid', $category->id)->update(['cid' => 2]);
+        Post::where('cid', $category->id)->update(['cid' => 1]);
 
         //    删除分类
         $res = $category->delete();
