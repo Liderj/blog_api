@@ -42,7 +42,7 @@ class AuthController extends BaseController
     $user = Auth::user();
     if($user->type == 0){
       if(!$this->getRoles($user->roles)){
-        return $this->failed('改管理员角色未分配权限');
+        return $this->failed('该管理员角色未分配权限');
       }
       $user->roles = $this->getRoles($user->roles);
       return $this->success($user);
@@ -55,6 +55,7 @@ class AuthController extends BaseController
   public function getRoles($id)
   {
     $roles = Role::find($id);
+    $this->success($roles);
     $permission_list = $roles->permission()->where('status', 1)->get();
     $roles['permission_list'] = $permission_list->isEmpty() ? null : $this->format($permission_list->toArray());
     return $roles;

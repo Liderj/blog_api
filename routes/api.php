@@ -13,41 +13,41 @@ use Illuminate\Http\Request;
 |
 */
 Route::prefix('auth')->group(function($router) {
-  $router-> post('login', 'AuthController@login');
+  $router-> post('login', 'AuthController@login')->name('admin.login');
   $router->post('logout', 'AuthController@logout');
 
 });
 Route::middleware('refresh.token','admin')->group(function($router) {
-  $router->get('user/info','AuthController@info');// 管理员详情
+  $router->get('user/info','AuthController@info')->name('user.info');// 管理员详情
+  $router->post('/user/{user}/update','UserController@update')->name('user.update'); //更新用户资料
+  $router->post('/user/{user}/frozen','UserController@frozen')->name('user.frozen');//冻结用户
 
-  $router->get('roles/index','RoleController@index');//角色列表
-  $router->get('roles/{role}','RoleController@show');//角色详情
-  $router->post('roles/create','RoleController@create');//创建角色
-  $router->post('roles/{role}/update','RoleController@update');//更新角色信息
-  $router->post('roles/{role}/update_permission','RoleController@updatePermission');//更新角色权限
-  $router->post('roles/{role}/destroy','RoleController@destroy');//删除角色
+  $router->get('roles/index','RoleController@index')->name('roles.index');//角色列表
+  $router->get('roles/{role}','RoleController@show')->name('roles.show');//角色详情
+  $router->post('roles/create','RoleController@create')->name('roles.create');//创建角色
+  $router->post('roles/{role}/update','RoleController@update')->name('roles.update');//更新角色信息
+  $router->post('roles/{role}/update_permission','RoleController@updatePermission')->name('roles.update_permission');//更新角色权限
+  $router->post('roles/{role}/destroy','RoleController@destroy')->name('roles.destroy');//删除角色
 
-  $router->post('/permission/{permission}/update','PermissionController@update'); //更新权限
-  $router->post('/user/{user}/update','UserController@update'); //更新用户资料
-  $router->post('/user/{user}/frozen','UserController@frozen');//冻结用户
+  $router->post('/permission/{permission}/update','PermissionController@update')->name('permission.update'); //更新权限
 
-  $router->get('/post/destroy/{post}','PostController@destroy');//删除文章
+
+  $router->get('/post/destroy/{post}','PostController@destroy')->name('post.destroy');//删除文章
   $router->get('/post/top','PostController@top');//热推文章
   Route::resource('post','PostController',['only' => ['index','show']]);
-  $router->post('/post/{post}/disable','PostController@disable');//关闭文章
+  $router->post('/post/{post}/disable','PostController@disable')->name('post.disable');//关闭文章
 
 
   Route::resource('category','CategoryController',['only' => ['index','store']]);
-  $router->post('/category/{category}/update','CategoryController@update');//更新分类
-  $router->post('/category/{category}/destroy','CategoryController@destroy');//删除分类
+  $router->post('/category/{category}/update','CategoryController@update')->name('category.update') ;//更新分类
+  $router->post('/category/{category}/destroy','CategoryController@destroy')->name('category.destroy') ;//删除分类
 
-  $router->get('/comment/{comment}','CommentController@show');
-  $router->get('/comment','CommentController@index');
-  $router->post('/comment/{comment}','CommentController@destroy');
+  $router->get('/comment/{comment}','CommentController@show')->name('comment.show');
+  $router->get('/comment','CommentController@index')->name('comment.index');
+  $router->post('/comment/{comment}','CommentController@destroy')->name('comment.destroy');
 
-  $router->get('/reply','ReplyController@index');
-  $router->post('/reply/{reply}','ReplyController@destroy');
-
+  $router->get('/reply','ReplyController@index')->name('reply.index');
+  $router->post('/reply/{reply}','ReplyController@destroy')->name('reply.destroy');
 
 
   Route::apiResources([

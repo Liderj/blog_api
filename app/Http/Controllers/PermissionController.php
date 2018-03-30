@@ -4,14 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Permission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 
 class PermissionController extends BaseController
 {
-  public function index()
+  public function index( Request $request)
   {
-    return $this->success($this->format(Permission::all()->toArray()));
+
+    $page_size = $request->query('page_size', 10);//每页条数
+    $page = $request->query('page',1);
+    $search = $request->query('search');//搜索
+    $type =  $request->query('type');//评论id
+
+//    查询结果分页
+    $res = Permission::where([
+      ['name', 'like', '%' . $search . '%'],
+    ])->where(function ($query ) use ($type){
+      if($type !== null){
+        $query->where('type',$type);
+      }
+    })
+      ->skip(($page-1)*$page_size)->take($page_size)->get();
+//    获取总条数
+    $count = Permission::all()->count();
+    $data = [
+      'count'=>$count,
+      'current_page'=>$page,
+      'list'=>$res->isNotEmpty()?$res:null
+    ];
+    return $this->success($data);
   }
 
   public function store(Request $request)
@@ -22,7 +46,7 @@ class PermissionController extends BaseController
         'unique:permissions,name'
       ],
       'type' => 'required',
-      'pid' => ['required'],
+      'pid' => 'required',
       'status' => 'required'
     ];
     $messages = [
@@ -30,6 +54,10 @@ class PermissionController extends BaseController
       'name.unique' => '该名称已存在',
     ];
     $this->validate($request, $rules, $messages);
+    if(Permission::where('id',$request->input('pid'))->get()->first()->type!==0){
+      return $this->failed('父权限不能为接口权限');
+    }
+
     $role = new Permission($request->only(['name', 'type', 'pid', 'url', 'status']));
     return $role->save() ? $this->message('添加成功') : $this->failed('添加失败');
   }
@@ -64,8 +92,12 @@ class PermissionController extends BaseController
     return $permission->save() ? $this->message('修改成功') : $this->failed('修改失败');
   }
 
-  public function destroy(Permission $permission)
+  public function destroy(Request $request, Permission $permission)
   {
+    //删除权限需验证登录密码
+    if(!$request->input('password') || !Hash::check( $request->input('password'),Auth::user()->password)){
+      return $this->failed('密码错误');
+    }
     //      创建数据库事务
     DB::beginTransaction();
     try {
