@@ -65,19 +65,22 @@ class RoleController extends BaseController
   public function update(Request $request, Role $role)
   {
     $rules = [
-      'name' => [
-        'required',
-        'unique:roles,name'
-      ],
+      'name' => 'required',
       'status' => 'required',
     ];
     $messages = [
       'name.required' => '名称不能为空',
-      'name.unique' => '该名称已存在'
     ];
     $this->validate($request, $rules, $messages);
-    $role->name = $request->input('name');
-    $role->status = $request->input('status');
+    if(Role::where('name',$request->input('name'))->count()&&$role->name !=$request->input('name')){
+      return $this->failed('该名称已存在');
+    }
+
+    foreach ($request->all() as $key => $v) {
+      if ($v != $role[$key]) {
+        $role[$key] = $v;
+      }
+    }
     return $role->save() ? $this->message('修改成功') : $this->failed('修改失败');
 
   }

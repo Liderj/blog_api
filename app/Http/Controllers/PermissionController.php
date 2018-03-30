@@ -17,14 +17,17 @@ class PermissionController extends BaseController
     $page_size = $request->query('page_size', 10);//每页条数
     $page = $request->query('page',1);
     $search = $request->query('search');//搜索
-    $type =  $request->query('type');//评论id
-
-//    查询结果分页
+    $type =  $request->query('type');
+    $pid = $request->query('pid');
+ //    查询结果分页
     $res = Permission::where([
       ['name', 'like', '%' . $search . '%'],
-    ])->where(function ($query ) use ($type){
+    ])->where(function ($query ) use ($type,$pid){
       if($type !== null){
         $query->where('type',$type);
+      }
+      if($pid !== null){
+        $query->where('pid',$pid);
       }
     })
       ->skip(($page-1)*$page_size)->take($page_size)->get();
@@ -54,7 +57,7 @@ class PermissionController extends BaseController
       'name.unique' => '该名称已存在',
     ];
     $this->validate($request, $rules, $messages);
-    if(Permission::where('id',$request->input('pid'))->get()->first()->type!==0){
+    if($request->input('pid')!=0 &&Permission::where('id',$request->input('pid'))->get()->first()->type!==0){
       return $this->failed('父权限不能为接口权限');
     }
 
