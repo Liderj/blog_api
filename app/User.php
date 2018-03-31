@@ -36,4 +36,9 @@ class User extends Authenticatable implements JWTSubject
     {
       return $this->hasMany('App\Reply','f_uid');
     }
+
+    public function role()
+    {
+      return $this->belongsTo('App\Role','roles');
+      }
 }

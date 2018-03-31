@@ -19,22 +19,37 @@ class PostController extends BaseController
     $search = $request->query('search');//文章标题关键字搜索
     $status = $request->query('status');//文章状态
     $cid = $request->query('type');//文章类型
+    $page = $request->query('page', 1);
+    $hot = $request->query('hot');
+
 //    查询结果分页
     $res = Post::where([
       ['title', 'like', '%' . $search . '%'],
-    ])->where(
-      function ($query) use ($status, $cid) {
-        if ($status !== null) {
-          $query->where('status', $status);
-        }
-        if ($cid !== null) {
-          $query->where('cid', $cid);
-        }
-      }
-    )
-      ->latest()
-      ->paginate($page_size);
-    return $this->success($res);
+    ]);
+
+    if ($status !== null) {
+      $res = $res->where('status', $status);
+    };
+    if ($cid !== null) {
+      $res = $res->where('cid', $cid);
+    };
+    if ($hot !== null) {
+      $res = $res->where('is_hot', $hot);
+    };
+//    获取总条数
+    $list = $res->skip(($page - 1) * $page_size)->take($page_size)->get(['id','pid','cid','likes','title','status','is_hot','is_comment','created_at']);
+    foreach ($list as $key => $value){
+      $value['user'] = $value->user()->first()->nickname;
+      $value['category'] = $value->category()->first()->id;
+
+    }
+    $count = $res->count();
+    $data = [
+      'count' => $count,
+      'current_page' => $page,
+      'list' => $list->isNotEmpty() ? $list : null
+    ];
+    return $this->success($data);
   }
 
 
@@ -46,7 +61,6 @@ class PostController extends BaseController
    */
   public function show(Post $post)
   {
-
     $post->author = $post->user()->get(['id', 'nickname','avatar'])->first();
     $post->category;
     return $this->success($post);
@@ -72,7 +86,6 @@ class PostController extends BaseController
   {
     if ($post->status == 0) {
       $post->status = 1;
-      $post->is_comment = 1;
     } else {
 //      关闭后不允许评论
       $post->status = 0;
@@ -82,11 +95,16 @@ class PostController extends BaseController
     return $post->save() ? $this->message('修改状态成功') : $this->failed('修改状态失败');
   }
 
-  public function is_comment(Post $post)
+  public function setComment(Post $post)
   {
 //    修改评论状态
-    $post->status == 0 ? $post->status = 1 : $post->status = 0;
-    return $post->save() ? $this->message('修改状态成功') : $this->failed('修改状态失败');
+    $post->is_comment == 0 ? $post->is_comment = 1 : $post->is_comment = 0;
+    return $post->save() ? $this->message('已更改评论状态') : $this->failed('修改状态失败');
+  }
+  public function setHot(Post $post)
+  {
+    $post->is_hot == 0 ? $post->is_hot = 1 : $post->is_hot = 0;
+    return $post->save() ? $this->message('已更改热推状态') : $this->failed('修改状态失败');
   }
 
   public function top()

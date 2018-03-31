@@ -87,7 +87,7 @@ class RoleController extends BaseController
 
   public function updatePermission(Request $request, Role $role)
   {
-    $res = $role->permission()->sync(json_decode($request->permissionId));
+    $res = $role->permission()->sync($request->permissionId);
     return $res ? $this->message('权限修改成功') : $this->failed('权限修改失败');
 
   }

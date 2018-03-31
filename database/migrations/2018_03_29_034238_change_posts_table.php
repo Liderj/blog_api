@@ -14,6 +14,8 @@ class ChangePostsTable extends Migration
     public function up()
     {
       Schema::table('posts', function (Blueprint $table) {
+        $table->string('title', 255)->change();
+        $table->longText('content')->nullable()->change();
         $table->string('img')->nullable() ->commnet('博客/微博图片,多图已逗号分隔');
       });
       Schema::table('reply', function (Blueprint $table) {

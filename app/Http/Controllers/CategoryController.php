@@ -60,8 +60,8 @@ class CategoryController extends BaseController
         'name.required' => '分类名称不能为空',
       ];
       $this->validate($request, $rules, $messages);
-      if(Category::where('kname',$request->input('name'))->count()&&$category->name !=$request->input('name')){
-        return $this->failed('此昵称已存在');
+      if(Category::where('name',$request->input('name'))->count()&&$category->name !=$request->input('name')){
+        return $this->failed('此名称已存在');
       }
       $category->name = $request->input('name');
       return $category->save() ? $this->message('修改成功') : $this->failed('修改失败');

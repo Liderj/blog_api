@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends  Model
 {
-  protected $hidden = ['cid','pid','status','is_hot','is_comment','created_at','updated_at'];
+  protected $hidden = ['updated_at'];
   protected $guarded = ['id'];
 
   public function user()

@@ -34,8 +34,10 @@ Route::middleware('refresh.token','admin')->group(function($router) {
 
   $router->get('/post/destroy/{post}','PostController@destroy')->name('post.destroy');//删除文章
   $router->get('/post/top','PostController@top');//热推文章
-  Route::resource('post','PostController',['only' => ['index','show']]);
+  $router->post('/post/hot/{post}','PostController@setHot')->name('post.hot');//热推文章
   $router->post('/post/{post}/disable','PostController@disable')->name('post.disable');//关闭文章
+  $router->post('/post/comment/{post}','PostController@setComment')->name('post.comment');//关闭文章
+  Route::resource('post','PostController',['only' => ['index','show']]);
 
 
   Route::resource('category','CategoryController',['only' => ['index','store']]);
