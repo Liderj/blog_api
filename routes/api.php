@@ -32,7 +32,7 @@ Route::middleware('refresh.token','admin')->group(function($router) {
   $router->post('/permission/{permission}/update','PermissionController@update')->name('permission.update'); //更新权限
 
 
-  $router->get('/post/destroy/{post}','PostController@destroy')->name('post.destroy');//删除文章
+  $router->post('/post/destroy/{post}','PostController@destroy')->name('post.destroy');//删除文章
   $router->get('/post/top','PostController@top');//热推文章
   $router->post('/post/hot/{post}','PostController@setHot')->name('post.hot');//热推文章
   $router->post('/post/{post}/disable','PostController@disable')->name('post.disable');//关闭文章

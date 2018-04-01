@@ -37,13 +37,13 @@ class PostController extends BaseController
       $res = $res->where('is_hot', $hot);
     };
 //    获取总条数
+    $count = $res->count();
     $list = $res->skip(($page - 1) * $page_size)->take($page_size)->get(['id','pid','cid','likes','title','status','is_hot','is_comment','created_at']);
     foreach ($list as $key => $value){
       $value['user'] = $value->user()->first()->nickname;
-      $value['category'] = $value->category()->first()->id;
+      $value['category'] = $value->category()->first()->name;
 
     }
-    $count = $res->count();
     $data = [
       'count' => $count,
       'current_page' => $page,
@@ -62,7 +62,7 @@ class PostController extends BaseController
   public function show(Post $post)
   {
     $post->author = $post->user()->get(['id', 'nickname','avatar'])->first();
-    $post->category;
+    $post->category = $post->category()->get(['name'])->first()->name;
     return $this->success($post);
   }
 
@@ -111,8 +111,9 @@ class PostController extends BaseController
   {
 //    点赞排行前10的文章
     $top_10 = Post::where('status', 1)->orderBy('likes', 'desc')->get()->take(10);
-//    推荐文章
+    //    推荐文章
     $hot = Post::where([['status', 1], ['is_hot', 1]])->get();
+
 //    合并去重
     foreach ($hot as $key => $value) {
       if (!$top_10->contains($value)) {
@@ -120,7 +121,8 @@ class PostController extends BaseController
       }
     }
     foreach ($top_10 as $key => $value) {
-      $top_10[$key] = $value->user['id'];
+      $value['user'] = $value->user()->first()->nickname;
+      $value['category'] = $value->category()->first()->id;
     }
     return $this->success(array_slice($top_10->toArray(), 0, 10));
   }
