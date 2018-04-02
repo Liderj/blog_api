@@ -19,14 +19,15 @@ class CommentController extends BaseController
       ['content', 'like', '%' . $search . '%'],
     ])
       ->latest()
-      ->skip($page-1)->take($page_size)->get();
+      ->skip(($page - 1) * $page_size)->take($page_size)->get();
 //    获取总条数
-    $count = Comment::all()->count();
+    $count = Comment::where([
+      ['content', 'like', '%' . $search . '%'],
+    ])->count();
 //    分页结果添加评论id 和文章id
     foreach ($res as $key=>$val){
       $val['user']= $val->user()->get(['id', 'nickname'])->first();
       $val['post']= $val->post()->get(['id', 'title'])->first();
-
     }
     $data = [
       'count'=>$count,

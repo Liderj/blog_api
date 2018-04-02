@@ -14,8 +14,11 @@ class RoleController extends BaseController
    *
    * @return \Illuminate\Http\Response
    */
-  public function index()
+  public function index(Request $request)
   {
+    if($request->query('status')){
+      return $this->success(Role::where('status',$request->query('status')));
+    }
     return $this->success(Role::all());
   }
 

@@ -27,7 +27,7 @@ class ReplyController extends BaseController
         }
       })
         ->latest()
-        ->skip($page-1)->take($page_size)->get();
+        ->skip(($page - 1) * $page_size)->take($page_size)->get();
 //    获取总条数
       $count = Reply::where([
         ['content', 'like', '%' . $search . '%'],
