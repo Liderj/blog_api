@@ -51,6 +51,8 @@ Route::middleware('refresh.token','admin')->group(function($router) {
   $router->get('/reply','ReplyController@index')->name('reply.index');
   $router->post('/reply/{reply}','ReplyController@destroy')->name('reply.destroy');
 
+  Route::resource('keyword','KeywordController',['only' => ['index','store','destroy']]);
+
 
   Route::apiResources([
     'permission'=> 'PermissionController',//  权限资源路由
