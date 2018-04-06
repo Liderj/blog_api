@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\MyTrait\ApiMessage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Mockery\Exception;
+use Illuminate\Support\Facades\Storage;
 
 class BaseController extends Controller
 {
@@ -43,17 +42,9 @@ class BaseController extends Controller
     return null;
   }
 
-  public
-  function paginate($table, $page_size = 10, $current_page = 1, $search)
-  {
-    if (empty($table)) {
-      return null;
-    }
-    $count = DB::table($table)
-      ->select(DB::raw('SELECT * FROM ' . $table . 'WHERE CONCAT(`mobile`,`nickname`) LIKE \'%' . $search . '%\''))->get();
-//    $offset = ($current_page - 1) * $page_size;
+  public function upload(Request $request){
 
-//    $data = Db::select('select * from email limit $offset,$page_size');
-    return $count;
+    $path = $request->file('file')->store('public');
+    return $this->success(Storage::url($path)) ;
   }
 }
