@@ -17,6 +17,7 @@ Route::prefix('auth')->group(function($router) {
   $router->post('logout', 'AuthController@logout');
 
 });
+Route::post('upload','BaseController@upload');
 Route::middleware('refresh.token','admin')->group(function($router) {
   $router->get('user/info','AuthController@info')->name('user.info');// 管理员详情
   $router->post('/user/{user}/update','UserController@update')->name('user.update'); //更新用户资料
