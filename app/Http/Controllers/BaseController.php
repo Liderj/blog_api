@@ -45,6 +45,6 @@ class BaseController extends Controller
   public function upload(Request $request){
 
     $path = $request->file('file')->store('public');
-    return $this->success(Storage::url($path)) ;
+    return $path ? $this->success(Storage::url($path)): $this->failed('上传失败');
   }
 }

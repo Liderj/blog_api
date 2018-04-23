@@ -53,7 +53,6 @@ class UserController extends BaseController
 
     $rules = [
       'password' => 'digits_between:6,18',
-
     ];
     $messages = [
       'password.digits_between' => '请输入6-18位密码',
@@ -61,11 +60,9 @@ class UserController extends BaseController
     if ($request->input('password')) {
       $this->validate($request, $rules, $messages);
     }
-
     if (User::where('nickname', $request->input('nickname'))->count() && $user->nickname != $request->input('nickname')) {
       return $this->failed('此昵称已存在');
     }
-
     $params = null;
     //管理员修改自己的信息
     if (Auth::user()->id == $user->id) {

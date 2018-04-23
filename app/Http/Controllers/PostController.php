@@ -82,6 +82,7 @@ class PostController extends BaseController
     }
   }
 
+//  关闭文章
   public function disable(Post $post)
   {
     if ($post->status == 0) {
@@ -91,16 +92,18 @@ class PostController extends BaseController
       $post->status = 0;
       $post->is_comment = 0;
     }
-
     return $post->save() ? $this->message('修改状态成功') : $this->failed('修改状态失败');
   }
 
+//评论
   public function setComment(Post $post)
   {
 //    修改评论状态
     $post->is_comment == 0 ? $post->is_comment = 1 : $post->is_comment = 0;
     return $post->save() ? $this->message('已更改评论状态') : $this->failed('修改状态失败');
   }
+
+//  设置热推
   public function setHot(Post $post)
   {
     $post->is_hot == 0 ? $post->is_hot = 1 : $post->is_hot = 0;
@@ -111,9 +114,8 @@ class PostController extends BaseController
   {
 //    点赞排行前10的文章
     $top_10 = Post::where('status', 1)->orderBy('likes', 'desc')->get()->take(10);
-    //    推荐文章
+//    已设置推荐的文章
     $hot = Post::where([['status', 1], ['is_hot', 1]])->get();
-
 //    合并去重
     foreach ($hot as $key => $value) {
       if (!$top_10->contains($value)) {
