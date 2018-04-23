@@ -61,3 +61,15 @@ Route::middleware('refresh.token','admin')->group(function($router) {
   ]);
 
 });
+
+
+
+Route::prefix('front-end')->group(function ($router){
+  $router-> post('login', 'frontEnd\AuthController@login');
+  $router->post('register','frontEnd\AuthController@register');
+  $router->post('logout', 'frontEnd\AuthController@logout');
+
+  Route::middleware('refresh.token')->group(function (){
+
+  });
+});
