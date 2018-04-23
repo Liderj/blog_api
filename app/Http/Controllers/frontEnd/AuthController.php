@@ -53,7 +53,8 @@ class AuthController extends BaseController
     ];
     $this->validate($request, $rules, $messages);
 
-    $user = new User($request->only(['mobile', 'password', 'nickname', 'avatar', 'sex', 'status', 'roles']));
+    $user = new User($request->only(['mobile', 'password', 'nickname', 'avatar', 'sex']));
+    $user->status = 1;
     $user->type = 1;
     $user->roles = 13;
     $user->password = bcrypt($user->password);
