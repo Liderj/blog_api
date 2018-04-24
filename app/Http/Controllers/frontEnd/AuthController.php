@@ -67,6 +67,15 @@ class AuthController extends BaseController
 
     return $this->message('退出成功');
   }
+  public function info()
+  {
+    $user = Auth::user();
+    if($user->status == 0){
+      return $this->failed('您已被锁定，请联系管理员解锁账号');
+    }else{
+      return $this->success($user);
+    }
+  }
 
 
 }

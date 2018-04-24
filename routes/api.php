@@ -69,7 +69,7 @@ Route::prefix('front-end')->group(function ($router){
   $router->post('register','frontEnd\AuthController@register');
   $router->post('logout', 'frontEnd\AuthController@logout');
   Route::resource('category','CategoryController',['only' => ['index','store']]);
-  Route::middleware('refresh.token')->group(function (){
-
+  Route::middleware('refresh.token')->group(function ($router){
+    $router->get('user','frontEnd\AuthController@info');// 管理员详情
   });
 });
