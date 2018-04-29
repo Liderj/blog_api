@@ -106,6 +106,9 @@ class PostController extends BaseController
 //  设置热推
   public function setHot(Post $post)
   {
+    if($post->cid == 1){
+      $this->failed('微博不能设置为热推文章');
+    }
     $post->is_hot == 0 ? $post->is_hot = 1 : $post->is_hot = 0;
     return $post->save() ? $this->message('已更改热推状态') : $this->failed('修改状态失败');
   }
@@ -113,9 +116,9 @@ class PostController extends BaseController
   public function top()
   {
 //    点赞排行前10的文章
-    $top_10 = Post::where('status', 1)->orderBy('likes', 'desc')->get()->take(10);
+    $top_10 = Post::where('status', 1)->where('cid','<>',1)->orderBy('likes', 'desc')->get()->take(10);
 //    已设置推荐的文章
-    $hot = Post::where([['status', 1], ['is_hot', 1]])->get();
+    $hot = Post::where([['status', 1], ['is_hot', 1],['cid','<>',1]])->get();
 //    合并去重
     foreach ($hot as $key => $value) {
       if (!$top_10->contains($value)) {

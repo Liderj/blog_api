@@ -19,5 +19,6 @@ class Reply extends Model
   public function user()
   {
     return $this->belongsTo('App\User','f_uid');
+
   }
 }

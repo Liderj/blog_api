@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends BaseController
 {
@@ -74,8 +75,26 @@ class AuthController extends BaseController
       return $this->failed('您已被锁定，请联系管理员解锁账号');
     }else{
       return $this->success($user);
-    }
+     }
   }
 
+  public function changePWd(Request $request)
+  {
+    $rules = [
+      'oldPassword' => 'required',
+      'password' => 'required',
+    ];
+    $messages = [
+      'oldPassword.required' => '原密码不能为空',
+      'password.required' => '新密码不能为空',
+    ];
+    $this->validate($request, $rules, $messages);
+    $user=Auth::user();
+    if(!Hash::check( $request->input('oldPassword'),$user->password)){
+      return $this->failed('原密码错误');
+    }
+    $user->password = bcrypt($request->input('password'));
+    return $user->save() ? $this->message('修改成功') : $this->failed('修改失败，请刷新后重试');
 
+  }
 }

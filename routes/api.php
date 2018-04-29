@@ -70,6 +70,14 @@ Route::prefix('front-end')->group(function ($router){
   $router->post('logout', 'frontEnd\AuthController@logout');
   Route::resource('category','CategoryController',['only' => ['index','store']]);
   Route::middleware('refresh.token')->group(function ($router){
-    $router->get('user','frontEnd\AuthController@info');// 管理员详情
+    $router->post('/changePWd','frontEnd\AuthController@changePWd');
+    $router->get('user','frontEnd\AuthController@info');// 用户资料
+    $router->get('/post/top','PostController@top');//热推文章
+    $router->get('/post/like/{post}','frontEnd\PostController@like');
+    Route::resource('post','frontEnd\PostController',['only' => ['index','show']]);
+    $router->get('/comment','frontEnd\CommentController@index');
+    $router->post('/comment','frontEnd\CommentController@addComment');
+    $router->post('/reply','frontEnd\CommentController@addReply');
+
   });
 });
