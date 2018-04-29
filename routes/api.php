@@ -71,9 +71,11 @@ Route::prefix('front-end')->group(function ($router){
   Route::resource('category','CategoryController',['only' => ['index','store']]);
   Route::middleware('refresh.token')->group(function ($router){
     $router->post('/changePWd','frontEnd\AuthController@changePWd');
+    $router->post('/changeInfo','frontEnd\AuthController@changeInfo');
     $router->get('user','frontEnd\AuthController@info');// 用户资料
     $router->get('/post/top','PostController@top');//热推文章
     $router->get('/post/like/{post}','frontEnd\PostController@like');
+    $router->post('/post/add','frontEnd\PostController@store');
     Route::resource('post','frontEnd\PostController',['only' => ['index','show']]);
     $router->get('/comment','frontEnd\CommentController@index');
     $router->post('/comment','frontEnd\CommentController@addComment');

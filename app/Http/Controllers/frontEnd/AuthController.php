@@ -97,4 +97,26 @@ class AuthController extends BaseController
     return $user->save() ? $this->message('修改成功') : $this->failed('修改失败，请刷新后重试');
 
   }
+  public function changeInfo(Request $request)
+  {
+    $rules = [
+      'avatar' => 'required',
+      'nickname' =>['unique:users,nickname','required'],
+      'sex'=>'required'
+    ];
+    $messages = [
+      'avatar.required' => '头像不能为空',
+      'sex.required' => '性别不能为空',
+      'nickname.required'=>'昵称不能为空',
+      'nickname.unique'=>'此昵称已存在'
+    ];
+    $this->validate($request, $rules, $messages);
+    $user=Auth::user();
+    $user->avatar = $request->input('avatar');
+    $user->nickname = $request->input('nickname');
+    $user->sex = $request->input('sex');
+    $user->password = bcrypt($request->input('password'));
+    return $user->save() ? $this->message('修改成功') : $this->failed('修改失败，请刷新后重试');
+
+  }
 }
