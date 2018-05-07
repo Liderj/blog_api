@@ -47,12 +47,17 @@ class CommentController extends BaseController
   {
 //      创建数据库事务
     DB::beginTransaction();
+    $post = $comment->post()->get()->first();
+    $count = 0;
     try {
       //    删除所有回复
         foreach ($comment->reply as $item){
+          $count ++;
           $item->delete();
         }
       $res =  $comment->delete();
+      $post->comment_count= $post->comment_count - 1-$count;
+      $post->save();
       DB::commit();
       return $res ? $this->message('删除成功') : $this->failed('删除失败');
     } catch (\Exception $exception) {
