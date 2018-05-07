@@ -57,7 +57,7 @@ class AuthController extends BaseController
     $user = new User($request->only(['mobile', 'password', 'nickname', 'avatar', 'sex']));
     $user->status = 1;
     $user->type = 1;
-    $user->roles = 13;
+    $user->roles = 2;
     $user->password = bcrypt($user->password);
     return $user->save() ? $this->message('注册成功') : $this->failed('注册失败，请刷新后重试');
   }
