@@ -27,6 +27,7 @@ class AuthController extends BaseController
     // 验证参数，如果验证失败，则会抛出 ValidationException 的异常
     $params = $this->validate($request, $rules, $messages);
 //    判断输入密码与数据库加密密码是否一致
+
     if ($token = Auth::guard('api')->attempt($params)) {
 //        判断用户是否被锁定
       return  Auth::user()->status ? $this->success(compact('token')) : $this->failed('该账户已被锁定，请联系相关人员解锁');
@@ -60,7 +61,7 @@ class AuthController extends BaseController
     $user = new User($request->only(['mobile', 'password', 'nickname', 'avatar', 'sex']));
     $user->status = 1;
     $user->type = 1;
-    $user->roles = 13;
+    $user->roles = 2;
     $user->password = bcrypt($user->password);
 //    数据库插入数据
     return $user->save() ? $this->message('注册成功') : $this->failed('注册失败，请刷新后重试');
@@ -108,21 +109,23 @@ class AuthController extends BaseController
 //      修改用户资料
     $rules = [
       'avatar' => 'required',
-      'nickname' =>['unique:users,nickname','required'],
+      'nickname' =>'required',
       'sex'=>'required'
     ];
     $messages = [
       'avatar.required' => '头像不能为空',
       'sex.required' => '性别不能为空',
       'nickname.required'=>'昵称不能为空',
-      'nickname.unique'=>'此昵称已存在'
     ];
     $this->validate($request, $rules, $messages);
+    $old_user=User::where('nickname', $request->input('nickname'))->get()->first();
+    if ($old_user && Auth::user()->id!=$old_user->id ) {
+      return $this->failed('此昵称已存在');
+    }
     $user=Auth::user();
     $user->avatar = $request->input('avatar');
     $user->nickname = $request->input('nickname');
     $user->sex = $request->input('sex');
-    $user->password = bcrypt($request->input('password'));
     return $user->save() ? $this->message('修改成功') : $this->failed('修改失败，请刷新后重试');
   }
 }

@@ -48,6 +48,9 @@ class ReplyController extends BaseController
     public function destroy(Reply $reply)
     {
 //       删除回复
+      $post=$reply->comment()->get()->first()->post()->get()->first();
+      $post->comment_count= $post->comment_count - 1;
+      $post->save();
       return  $reply->delete() ? $this->message('删除回复成功') : $this->failed('删除回复失败');
     }
 }
