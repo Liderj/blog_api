@@ -20,7 +20,7 @@ class AuthController extends BaseController
     $messages = [
       'required' => '手机号或密码不能为空',
     ];
-    // 验证参数，如果验证失败，则会抛出 ValidationException 的异常
+      // 验证参数，如果验证失败，则会抛出 ValidationException 的异常
     $params = $this->validate($request, $rules, $messages);
 
     if ($token = Auth::guard('api')->attempt($params)) {

@@ -14,6 +14,7 @@ class KeywordController extends BaseController
      */
     public function index()
     {
+//        获取所有敏感词
         return $this->success(Keyword::all());
     }
 
@@ -25,6 +26,7 @@ class KeywordController extends BaseController
      */
     public function store(Request $request)
     {
+//        添加敏感词
       $rules = [
         'content' => [
           'required',
@@ -48,6 +50,7 @@ class KeywordController extends BaseController
      */
     public function destroy(Keyword $keyword)
     {
+//        删除敏感词
          return $keyword->delete() ? $this->message('删除成功') : $this->failed('删除失败');
      }
 }

@@ -11,15 +11,15 @@ class CommentController extends BaseController
 {
   public function index(Request $request)
   {
+//      获取所有评论
     $page_size = $request->query('page_size', 10);//每页条数
     $page = $request->query('page',1);
     $search = $request->query('search');//评论搜索
-//    查询结果分页
     $res = Comment::where([
       ['content', 'like', '%' . $search . '%'],
     ])
       ->latest()
-      ->skip(($page - 1) * $page_size)->take($page_size)->get();
+      ->skip(($page - 1) * $page_size)->take($page_size)->get();//    查询结果分页
 //    获取总条数
     $count = Comment::where([
       ['content', 'like', '%' . $search . '%'],
@@ -39,12 +39,15 @@ class CommentController extends BaseController
 
   public function show(Comment $comment)
   {
+//      获取评论详情
       $comment->user = $comment->user()->get(['id', 'nickname','avatar'])->first();
       return $this->success($comment);
     }
 
   public function destroy(Comment $comment)
   {
+//      删除评论及以下的回复
+
 //      创建数据库事务
     DB::beginTransaction();
     try {

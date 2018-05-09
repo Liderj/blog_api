@@ -16,6 +16,7 @@ class RoleController extends BaseController
    */
   public function index(Request $request)
   {
+//      获取所有角色
     if($request->query('status')){
       return $this->success(Role::where('status',$request->query('status')));
     }
@@ -29,6 +30,7 @@ class RoleController extends BaseController
    */
   public function create(Request $request)
   {
+//      创建角色
     $rules = [
       'name' => [
         'required',
@@ -53,8 +55,10 @@ class RoleController extends BaseController
    */
   public function show(Role $role)
   {
-    $permission_list = $role->permission()->get();
-    $role['permission_list'] = $permission_list->isEmpty() ? null : $this->format($permission_list->toArray());
+//      角色详情
+//    获取该角色所有权限！！！！！！！！！！！！！！！！！！！
+      $permission_list = $role->permission()->get();
+      $role['permission_list'] = $permission_list->isEmpty() ? null : $this->format($permission_list->toArray());
     return $this->success($role);
   }
 
@@ -67,6 +71,7 @@ class RoleController extends BaseController
    */
   public function update(Request $request, Role $role)
   {
+//      更新角色
     $rules = [
       'name' => 'required',
       'status' => 'required',
@@ -90,6 +95,7 @@ class RoleController extends BaseController
 
   public function updatePermission(Request $request, Role $role)
   {
+//      更新权限
     $res = $role->permission()->sync($request->permissionId);
     return $res ? $this->message('权限修改成功') : $this->failed('权限修改失败');
 
@@ -103,6 +109,8 @@ class RoleController extends BaseController
    */
   public function destroy(Role $role)
   {
+//      删除角色
+
     //创建数据库事务
     DB::beginTransaction();
     try {
@@ -112,7 +120,6 @@ class RoleController extends BaseController
       $role->permission()->detach();
       //    删除角色
       $res = $role->delete();
-
       DB::commit();
       return $res ? $this->message('角色删除成功') : $this->failed('角色删除失败');
     } catch (\Exception $exception) {

@@ -13,7 +13,7 @@ class PermissionController extends BaseController
 {
   public function index( Request $request)
   {
-
+    //  查询所有权限
     $page_size = $request->query('page_size', 10);//每页条数
     $page = $request->query('page',1);
     $search = $request->query('search');//搜索
@@ -43,6 +43,7 @@ class PermissionController extends BaseController
 
   public function store(Request $request)
   {
+//      添加新权限
     $rules = [
       'name' => [
         'required',
@@ -67,12 +68,13 @@ class PermissionController extends BaseController
 
   public function show(Permission $permission)
   {
+//      权限详情
     return $permission ? $this->success($permission) : $this->failed('没有找到此权限');
   }
 
   public function update(Request $request, Permission $permission)
   {
-
+//更新权限
 //    参数验证
     $rules = [
       'name' => 'required',
@@ -97,6 +99,7 @@ class PermissionController extends BaseController
 
   public function destroy(Request $request, Permission $permission)
   {
+
     //删除权限需验证登录密码
     if(!$request->input('password') || !Hash::check( $request->input('password'),Auth::user()->password)){
       return $this->failed('密码错误');

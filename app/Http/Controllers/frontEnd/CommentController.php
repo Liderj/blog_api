@@ -14,8 +14,8 @@ class CommentController extends BaseController
 {
   public function index(Request $request)
   {
+//      获取指定文章的所有评论以及回复
     $post_id = $request->input('pid');
-
     $comment =Comment::where('pid', $post_id)->orderBy('created_at', 'desc')->get();
     foreach ($comment as $key=>$val){
       $val['nickname']= $val->user()->get()->first()->nickname;
@@ -30,6 +30,7 @@ class CommentController extends BaseController
 
   public function addComment(Request $request)
   {
+//      添加评论
     $rules = [
       'pid'=>'required',
       'content' => 'required'
@@ -39,7 +40,7 @@ class CommentController extends BaseController
     ];
     $this->validate($request, $rules, $messages);
 
-    $keywords = Keyword::all();
+    $keywords = Keyword::all();//获取已有的敏感词
     foreach ($keywords as $val){
       if(strstr($val->content,$request->input('content'))){
         return $this->failed('您的输入包含敏感字，请重新输入');
@@ -48,13 +49,14 @@ class CommentController extends BaseController
     $comment = new Comment($request->only(['pid', 'content']));
     $comment->uid = Auth::id();
     $post = Post::where('id',$request->input('pid'))->get()->first();
-    $post->comment_count = $post->comment_count+1;
+    $post->comment_count = $post->comment_count+1;  //当前文章评论数+1
     $post->save();
     return $comment->save() ? $this->message('评论成功') : $this->failed('评论失败');
   }
 
   public function addReply(Request $request)
   {
+//      添加回复
     $rules = [
       'cid'=>'required',
       'content' => 'required'

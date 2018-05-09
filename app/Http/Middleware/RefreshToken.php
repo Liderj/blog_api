@@ -39,6 +39,7 @@ class RefreshToken extends BaseMiddleware
 
   public function checkForToken( Request $request)
   {
+//      检验token合法性
     if (!$this->auth->parser()->setRequest($request)->hasToken()) {
       throw new UnauthorizedHttpException('jwt-auth', '请求header中未添加token');
     }

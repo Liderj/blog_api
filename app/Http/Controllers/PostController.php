@@ -15,18 +15,18 @@ class PostController extends BaseController
    */
   public function index(Request $request)
   {
+//      获取所有文章列表
     $page_size = $request->query('page_size', 10);//每页条数
     $search = $request->query('search');//文章标题关键字搜索
     $status = $request->query('status');//文章状态
-    $cid = $request->query('type');//文章类型
-    $page = $request->query('page', 1);
-    $hot = $request->query('hot');
+    $cid = $request->query('type');//文章分类
+    $page = $request->query('page', 1);//当前页数
+    $hot = $request->query('hot');//热门推荐
 
 //    查询结果分页
     $res = Post::where([
       ['title', 'like', '%' . $search . '%'],
     ]);
-
     if ($status !== null) {
       $res = $res->where('status', $status);
     };
@@ -61,6 +61,7 @@ class PostController extends BaseController
    */
   public function show(Post $post)
   {
+//      文章详情
     $post->author = $post->user()->get(['id', 'nickname','avatar'])->first();
     $post->category = $post->category()->get(['name'])->first()->name;
     return $this->success($post);
@@ -69,8 +70,10 @@ class PostController extends BaseController
 
   public function destroy(Post $post)
   {
+//      删除文章
     DB::beginTransaction();
     try {
+//        评论和回复删除
       $post->comments()->delete();
       $res= $post->delete();
       DB::commit();
@@ -95,7 +98,6 @@ class PostController extends BaseController
     return $post->save() ? $this->message('修改状态成功') : $this->failed('修改状态失败');
   }
 
-//评论
   public function setComment(Post $post)
   {
 //    修改评论状态
@@ -113,6 +115,7 @@ class PostController extends BaseController
     return $post->save() ? $this->message('已更改热推状态') : $this->failed('修改状态失败');
   }
 
+//  获取热推列表
   public function top()
   {
 //    点赞排行前10的文章

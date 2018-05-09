@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
 {
-//   所有用户
+//   获取所有用户
   public function index(Request $request)
   {
     $page_size = $request->query('page_size', 10);//每页条数

@@ -18,6 +18,7 @@ class CategoryController extends BaseController
      */
     public function index()
     {
+        //获取所有分类
         return $this->success(Category::all());
     }
 
@@ -29,6 +30,7 @@ class CategoryController extends BaseController
      */
     public function store(Request $request)
     {
+        //创建分类
       $rules = [
         'name' => [
           'required',
@@ -53,6 +55,7 @@ class CategoryController extends BaseController
      */
     public function update(Request $request, Category $category)
     {
+//        更新分类
       $rules = [
         'name' => 'required',
       ];
@@ -83,15 +86,13 @@ class CategoryController extends BaseController
       if($category->id ===1 || $category->id==2){
         return $this->failed('该分类不允许删除');
       }
-      //创建数据库事务
+      //创建数据库事务  主要防止系统异常导致数据丢失的自动恢复。
       DB::beginTransaction();
       try {
         //    将拥有该分类的文章全部分配到无分类下
         Post::where('cid', $category->id)->update(['cid' => 1]);
-
         //    删除分类
         $res = $category->delete();
-
         DB::commit();
         return $res ? $this->message('分类删除成功') : $this->failed('分类删除失败');
       } catch (\Exception $exception) {

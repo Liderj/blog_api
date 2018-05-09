@@ -14,8 +14,9 @@ class ReplyController extends BaseController
      */
     public function index(Request $request)
     {
+//        获取所有回复
       $page_size = $request->query('page_size', 10);//每页条数
-      $page = $request->query('page',1);
+      $page = $request->query('page',1);//当前页数
       $search = $request->query('search');//搜索
       $cid =  $request->query('cid');//评论id
 //    查询结果分页
@@ -46,6 +47,7 @@ class ReplyController extends BaseController
 
     public function destroy(Reply $reply)
     {
+//       删除回复
       return  $reply->delete() ? $this->message('删除回复成功') : $this->failed('删除回复失败');
     }
 }
